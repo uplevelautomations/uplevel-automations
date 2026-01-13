@@ -42,7 +42,7 @@ export default function About() {
               </p>
 
               <p>
-                I'm a certified AI Transformation Consultant through the AAA Mastermind, the top AI transformation community in the world, led by Liam Ottley (who's built his agency to $10M+ working with NBA teams and publicly traded companies).
+                I'm a certified AI Transformation Consultant through the AAA Mastermind, the top AI automation community in the world.
               </p>
 
               <p>
