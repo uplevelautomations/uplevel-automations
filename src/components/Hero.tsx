@@ -24,7 +24,7 @@ export default function Hero() {
         </span>
 
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 tracking-tight leading-tight mb-6">
-          The AI partner for business owners who want results,&nbsp;not&nbsp;hype.
+          The <span className="text-blue-600">AI partner</span> for businesses who want results, not hype.
         </h1>
 
         <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
