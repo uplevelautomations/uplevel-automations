@@ -689,9 +689,11 @@ export default function Assessment() {
                   <div className="flex flex-col md:flex-row gap-8">
                     {/* Photo and name */}
                     <div className="md:w-1/3 text-center md:text-left">
-                      <div className="w-32 h-32 mx-auto md:mx-0 bg-slate-200 rounded-2xl flex items-center justify-center text-slate-400 text-sm mb-4">
-                        Photo
-                      </div>
+                      <img
+                        src="/roy-headshot.png"
+                        alt="Roy Banwell"
+                        className="w-32 h-32 mx-auto md:mx-0 rounded-2xl object-cover mb-4"
+                      />
                       <h4 className="text-xl font-bold text-slate-900">Roy Banwell</h4>
                       <p className="text-slate-500">AI Transformation Consultant</p>
 
@@ -717,17 +719,6 @@ export default function Assessment() {
                         <p>
                           I'm a certified AI Transformation Consultant through the AAA Mastermind, the top AI transformation community in the world.
                         </p>
-                      </div>
-
-                      {/* Certification badge placeholder */}
-                      <div className="mt-6 flex items-center gap-3 p-3 bg-slate-50 rounded-lg w-fit">
-                        <div className="w-10 h-10 bg-slate-200 rounded flex items-center justify-center text-slate-400 text-xs">
-                          Badge
-                        </div>
-                        <div>
-                          <div className="text-xs text-slate-500">Certified by</div>
-                          <div className="text-sm font-medium text-slate-700">AAA Mastermind</div>
-                        </div>
                       </div>
                     </div>
                   </div>
