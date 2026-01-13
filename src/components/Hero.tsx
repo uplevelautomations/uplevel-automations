@@ -28,7 +28,7 @@ export default function Hero() {
         </h1>
 
         <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
-          Take a 2-minute assessment to see where AI can help, and what to do first.
+          Take a 2-minute assessment to see if your business is ready for AI — and where to start.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
