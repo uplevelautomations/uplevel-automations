@@ -331,7 +331,7 @@ export default function Assessment() {
     }
 
     // Send to Google Sheets in background
-    fetch('https://script.google.com/macros/s/AKfycbxaCezMoLbl5m1NhHGZXrATn1_z-ZAMk1P61lzovsUMiFd8lCbOgv98IwdBepKHaqt0/exec', {
+    fetch('https://script.google.com/macros/s/AKfycbw4ZBtnFGnMDu23z6WoXhy--hMFMJy_o8bVOSVJcfi1oSyQUEV5AFzRvIaqyJkcnNayyA/exec', {
       method: 'POST',
       mode: 'no-cors',
       headers: {
