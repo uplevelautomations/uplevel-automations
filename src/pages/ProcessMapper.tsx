@@ -332,8 +332,13 @@ function ChatInterface({
 
       setMessages(prev => [...prev, { role: 'assistant', content: assistantMessage }])
 
+      // Auto-trigger PDF generation when process is complete
       if (assistantMessage.includes('[PROCESS_COMPLETE]')) {
         setIsComplete(true)
+        // Small delay to let the message render, then auto-generate
+        setTimeout(() => {
+          handleGeneratePDFAuto([...messages, { role: 'user', content: userMessage }, { role: 'assistant', content: assistantMessage }])
+        }, 1500)
       }
     } catch (error) {
       console.error('Chat error:', error)
@@ -342,6 +347,26 @@ function ChatInterface({
         { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }
       ])
     } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGeneratePDFAuto = async (allMessages: Message[]) => {
+    setIsLoading(true)
+    try {
+      const extractResponse = await fetch('/api/extract-process-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: allMessages }),
+      })
+
+      if (!extractResponse.ok) throw new Error('Failed to extract data')
+
+      const processData: ProcessData = await extractResponse.json()
+      onComplete(processData, allMessages)
+    } catch (error) {
+      console.error('Extraction error:', error)
+      alert('Sorry, there was an error generating your document. Please try again.')
       setIsLoading(false)
     }
   }
@@ -382,13 +407,18 @@ function ChatInterface({
           <h2 className="text-xl font-bold text-slate-900">Process Mapping Session</h2>
           <p className="text-sm text-slate-500">with {userInfo.name}</p>
         </div>
-        {isComplete && (
+        {isComplete && isLoading && (
+          <div className="flex items-center gap-3 px-6 py-2.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-lg">
+            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            Generating your document...
+          </div>
+        )}
+        {isComplete && !isLoading && (
           <button
             onClick={handleGeneratePDF}
-            disabled={isLoading}
-            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-medium rounded-lg transition-all shadow-lg shadow-blue-600/25"
+            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all shadow-lg shadow-blue-600/25"
           >
-            {isLoading ? 'Generating...' : 'Generate My Process Document'}
+            Generate My Process Document
           </button>
         )}
       </div>
