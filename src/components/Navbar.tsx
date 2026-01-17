@@ -53,7 +53,8 @@ export default function Navbar() {
             </button>
 
             {resourcesOpen && (
-              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-2">
+              <div className="absolute top-full left-0 pt-2 w-56">
+                <div className="bg-white rounded-lg shadow-lg border border-slate-200 py-2">
                 <Link
                   to="/ai-readiness"
                   className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900"
@@ -68,6 +69,7 @@ export default function Navbar() {
                   <div className="font-medium">Process Mapper</div>
                   <div className="text-xs text-slate-500 mt-0.5">Document a workflow in minutes</div>
                 </Link>
+                </div>
               </div>
             )}
           </div>
