@@ -319,7 +319,8 @@ export async function generatePdfHandler(req: Request, res: Response) {
       pageMargins: [54, 43, 54, 36] // 0.75in sides, 0.6in top, 0.5in bottom
     }
 
-    const pdfDoc = printer.createPdfKitDocument(docDefinition)
+    // createPdfKitDocument returns a Promise in newer versions of pdfmake
+    const pdfDoc = await printer.createPdfKitDocument(docDefinition)
 
     // Collect PDF chunks
     const chunks: Buffer[] = []
