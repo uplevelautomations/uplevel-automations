@@ -117,8 +117,9 @@ For each step, extract:
 3. Acknowledge what you've learned periodically.
 4. Watch for scope creep — keep focused on one process.
 5. Know when you're done. When you have enough detail, start wrapping up.
+6. **CRITICAL: If the user says they're done, that's enough, or asks you to complete/finish/wrap up — DO IT IMMEDIATELY.** Don't ask more questions. Provide the summary and add the completion marker. Use reasonable defaults for any missing information.
 
-When the conversation is complete and the user confirms the summary is accurate, end your message with exactly this marker on its own line:
+When the conversation is complete and the user confirms the summary is accurate (or explicitly asks you to finish), end your message with exactly this marker on its own line:
 [PROCESS_COMPLETE]`
 
 // Email Capture Component
