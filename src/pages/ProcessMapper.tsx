@@ -410,7 +410,7 @@ function ChatInterface({
 }
 
 // Google Apps Script URL (same as Assessment)
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzc6PJdXRQSSUVLVqFESZJAzWYfXknqK5srugukQNEednmerUBDM2fCtmUHtZSun_zHpg/exec'
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzs806_T0UUwSAMwZa_ppjAobgf4STx_85d3pGjGCc28fr4GTRnG6RkBAm-BhMVBy-XaA/exec'
 
 // Process Complete Component
 function ProcessComplete({
