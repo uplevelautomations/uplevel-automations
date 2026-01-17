@@ -1,6 +1,9 @@
 import { Request, Response } from 'express'
-import PdfPrinter from 'pdfmake'
+import pdfmakePkg from 'pdfmake'
 import type { TDocumentDefinitions, Content } from 'pdfmake/interfaces'
+
+// Handle ESM/CJS interop - pdfmake exports differently
+const PdfPrinter = (pdfmakePkg as any).default || pdfmakePkg
 
 interface ProcessData {
   processName: string
