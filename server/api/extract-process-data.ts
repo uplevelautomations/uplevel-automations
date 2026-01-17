@@ -73,7 +73,19 @@ export async function extractProcessDataHandler(req: Request, res: Response) {
     })
 
     const textContent = response.content.find((block) => block.type === 'text')
-    const content = textContent?.type === 'text' ? textContent.text : '{}'
+    let content = textContent?.type === 'text' ? textContent.text : '{}'
+
+    // Strip markdown code blocks if present (Claude sometimes wraps JSON in ```json ... ```)
+    content = content.trim()
+    if (content.startsWith('```json')) {
+      content = content.slice(7) // Remove ```json
+    } else if (content.startsWith('```')) {
+      content = content.slice(3) // Remove ```
+    }
+    if (content.endsWith('```')) {
+      content = content.slice(0, -3) // Remove trailing ```
+    }
+    content = content.trim()
 
     try {
       const processData = JSON.parse(content)
