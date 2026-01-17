@@ -3,8 +3,9 @@ import { createRequire } from 'module'
 import type { TDocumentDefinitions, Content } from 'pdfmake/interfaces'
 
 // Use require for CJS module compatibility
+// pdfmake exports the Printer class from pdfmake/js/Printer.default
 const require = createRequire(import.meta.url)
-const PdfPrinter = require('pdfmake')
+const PdfPrinter = require('pdfmake/js/Printer').default
 
 interface ProcessData {
   processName: string
