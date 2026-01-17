@@ -234,8 +234,64 @@ function ChatInterface({
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const [speechSupported, setSpeechSupported] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
+
+  // Check for speech recognition support
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (SpeechRecognition) {
+      setSpeechSupported(true)
+      const recognition = new SpeechRecognition()
+      recognition.continuous = true
+      recognition.interimResults = true
+      recognition.lang = 'en-US'
+
+      recognition.onresult = (event) => {
+        let finalTranscript = ''
+        let interimTranscript = ''
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript
+          } else {
+            interimTranscript += transcript
+          }
+        }
+
+        if (finalTranscript) {
+          setInput(prev => prev + finalTranscript)
+        }
+      }
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error)
+        setIsListening(false)
+      }
+
+      recognition.onend = () => {
+        setIsListening(false)
+      }
+
+      recognitionRef.current = recognition
+    }
+  }, [])
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) return
+
+    if (isListening) {
+      recognitionRef.current.stop()
+      setIsListening(false)
+    } else {
+      recognitionRef.current.start()
+      setIsListening(true)
+    }
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -376,16 +432,42 @@ function ChatInterface({
       {!isComplete ? (
         <form onSubmit={handleSubmit} className="mt-4 pt-4 border-t border-slate-200">
           <div className="flex gap-3">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type your response..."
-              rows={2}
-              disabled={isLoading}
-              className="flex-1 px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none disabled:opacity-50"
-            />
+            <div className="flex-1 relative">
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={isListening ? "Listening..." : "Type your response..."}
+                rows={2}
+                disabled={isLoading}
+                className={`w-full px-4 py-3 pr-12 bg-white border rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none disabled:opacity-50 ${isListening ? 'border-red-400 ring-2 ring-red-200' : 'border-slate-300'}`}
+              />
+              {speechSupported && (
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  disabled={isLoading}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-lg transition-all ${
+                    isListening
+                      ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700'
+                  } disabled:opacity-50`}
+                  title={isListening ? "Stop listening" : "Start voice input"}
+                >
+                  {isListening ? (
+                    <svg className="w-5 h-5 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                      <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                  )}
+                </button>
+              )}
+            </div>
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
@@ -395,7 +477,7 @@ function ChatInterface({
             </button>
           </div>
           <p className="text-xs text-slate-500 mt-2">
-            Press Enter to send, Shift+Enter for new line
+            Press Enter to send, Shift+Enter for new line{speechSupported && ' • Click mic to dictate'}
           </p>
         </form>
       ) : (
