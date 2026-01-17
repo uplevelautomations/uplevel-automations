@@ -31,7 +31,7 @@ export async function chatHandler(req: Request, res: Response) {
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
-      max_tokens: 1024,
+      max_tokens: 4096,
       system: systemPrompt,
       messages: anthropicMessages,
     })
