@@ -310,8 +310,10 @@ export default function Assessment() {
     // Fire webhook in background (don't await)
     const score = calculateScore(answers)
     const qualified = !isDisqualified(answers)
+    const { strengths, improvements, quickWins } = generateFeedback(answers)
 
     const submissionData = {
+      type: 'assessment',
       timestamp: new Date().toISOString(),
       name: contactInfo.name,
       email: contactInfo.email,
@@ -331,7 +333,7 @@ export default function Assessment() {
     }
 
     // Send to Google Sheets in background
-    fetch('https://script.google.com/macros/s/AKfycbw4ZBtnFGnMDu23z6WoXhy--hMFMJy_o8bVOSVJcfi1oSyQUEV5AFzRvIaqyJkcnNayyA/exec', {
+    fetch('https://script.google.com/macros/s/AKfycbzc6PJdXRQSSUVLVqFESZJAzWYfXknqK5srugukQNEednmerUBDM2fCtmUHtZSun_zHpg/exec', {
       method: 'POST',
       mode: 'no-cors',
       headers: {
@@ -340,6 +342,38 @@ export default function Assessment() {
       body: JSON.stringify(submissionData),
     }).catch(error => {
       console.error('Error submitting to Google Sheets:', error)
+    })
+
+    // Send emails via Resend
+    fetch('/api/send-assessment-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: contactInfo.email,
+        toName: contactInfo.name,
+        phone: contactInfo.phone,
+        score,
+        qualified,
+        answers: {
+          q1: answers.q1 || '',
+          q2: answers.q2 || '',
+          q2a: answers.q2a || '',
+          q3: answers.q3 || '',
+          q4: answers.q4 || '',
+          q5: answers.q5 || '',
+          q6: answers.q6 || '',
+          q7: answers.q7 || '',
+          q8: answers.q8 || '',
+          q9: answers.q9 || '',
+        },
+        strengths,
+        improvements,
+        quickWins,
+      }),
+    }).catch(error => {
+      console.error('Error sending assessment email:', error)
     })
   }
 
@@ -757,9 +791,22 @@ export default function Assessment() {
                     }}
                   />
                 </div>
+
+                {/* Process Mapper CTA - Fallback for those not ready to book */}
+                <div className="mt-8 p-6 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+                  <p className="text-slate-600 mb-4">
+                    Not ready to book yet? Document one of your processes first and come back when you're ready.
+                  </p>
+                  <Link
+                    to="/process-mapper"
+                    className="inline-flex items-center justify-center px-6 py-3 text-slate-600 hover:text-slate-900 font-medium transition-colors"
+                  >
+                    Map a Process →
+                  </Link>
+                </div>
               </>
             ) : (
-              /* DQ'd: Give advice */
+              /* DQ'd: Give advice + Process Mapper CTA */
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
                 <h2 className="text-xl font-bold text-slate-900 mb-4">
                   You're not quite ready — and that's okay.
@@ -779,9 +826,24 @@ export default function Assessment() {
                   ))}
                 </div>
 
-                <p className="text-slate-500 text-sm">
-                  I'll stay in touch with practical tips on AI and automation. When the time is right, you'll know where to find me.
-                </p>
+                {/* Process Mapper CTA */}
+                <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 mt-8">
+                  <h3 className="text-lg font-bold text-white mb-2">
+                    Start Building Your Foundation
+                  </h3>
+                  <p className="text-blue-100 text-sm mb-4">
+                    The first step to AI readiness? Document your processes. Use our free Process Mapper to create a clear workflow in minutes — no AI experience needed.
+                  </p>
+                  <Link
+                    to="/process-mapper"
+                    className="inline-flex items-center justify-center w-full px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
+                  >
+                    Map Your First Process →
+                  </Link>
+                  <p className="text-blue-200 text-xs text-center mt-3">
+                    Once you've documented a few processes, retake this assessment — you'll be surprised how much your score improves.
+                  </p>
+                </div>
               </div>
             )}
 
