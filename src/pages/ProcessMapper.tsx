@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
 
 // Types
 interface Message {
@@ -406,9 +407,17 @@ function ChatInterface({
                   : 'bg-white border border-slate-200 text-slate-700 shadow-sm'
               }`}
             >
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {message.content.replace('[PROCESS_COMPLETE]', '').trim()}
-              </p>
+              {message.role === 'user' ? (
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {message.content}
+                </p>
+              ) : (
+                <div className="text-sm leading-relaxed prose prose-sm prose-slate max-w-none prose-headings:text-slate-900 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-strong:text-slate-800">
+                  <ReactMarkdown>
+                    {message.content.replace('[PROCESS_COMPLETE]', '').trim()}
+                  </ReactMarkdown>
+                </div>
+              )}
             </div>
           </div>
         ))}
