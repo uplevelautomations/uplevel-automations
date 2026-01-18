@@ -215,6 +215,31 @@ function EmailCapture({ onSubmit }: { onSubmit: (info: UserInfo) => void }) {
           We'll email you the completed process document. No spam, ever.
         </p>
       </div>
+
+      {/* Process Ideas Section */}
+      <div className="max-w-2xl mx-auto mt-16 text-center">
+        <p className="text-sm font-medium text-slate-500 mb-4">Not sure what to map?</p>
+        <p className="text-slate-600 mb-6">
+          The highest-impact processes to document are usually:
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <h4 className="font-semibold text-slate-900 mb-1">Client Onboarding</h4>
+            <p className="text-sm text-slate-600">How you bring new clients into your business</p>
+          </div>
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <h4 className="font-semibold text-slate-900 mb-1">Service Delivery</h4>
+            <p className="text-sm text-slate-600">How you actually deliver what you sell</p>
+          </div>
+          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <h4 className="font-semibold text-slate-900 mb-1">Sales Process</h4>
+            <p className="text-sm text-slate-600">How leads become paying customers</p>
+          </div>
+        </div>
+        <p className="text-sm text-slate-500 mt-4">
+          Or map any process that's eating up your time — we'll help you document it.
+        </p>
+      </div>
     </div>
   )
 }
@@ -230,7 +255,16 @@ function ChatInterface({
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: `Hi ${userInfo.name}! I'm here to help you map out one of your business processes. By the end of our conversation, you'll have a clear, documented workflow that shows exactly how this process works — who does what, when, and how.\n\nTo get started, tell me a bit about your business and what process you'd like to map out. For example: "I run a marketing consultancy with a small team, and I want to map out how we onboard new clients."`
+      content: `Hi ${userInfo.name}! I'm here to help you map out one of your business processes. By the end of our conversation, you'll have a clear, documented workflow that shows exactly how this process works — who does what, when, and how.
+
+To get started, tell me a bit about your business and what process you'd like to map out.
+
+**Not sure where to start?** The highest-impact processes to document are usually:
+- **Client Onboarding** — how you bring new clients into your business
+- **Service Delivery** — how you actually deliver what you sell
+- **Sales** — how leads become paying customers
+
+But you can map any process — just tell me what's eating up your time!`
     }
   ])
   const [input, setInput] = useState('')
