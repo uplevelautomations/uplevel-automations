@@ -11,8 +11,8 @@ export default function Services() {
       highlight: true
     },
     {
-      title: "5-Day AI Roadmap",
-      description: "Deep dive into your business, identify 5-8 AI opportunities with ROI projections, and deliver a prioritized 3-month action plan.",
+      title: "AI Audit",
+      description: "Deep dive into your business, identify 5-8 AI opportunities with ROI projections, and deliver a prioritized action plan. Delivered in 1-2 weeks.",
       cta: "Start with Assessment",
       href: "/ai-readiness",
       isLink: true

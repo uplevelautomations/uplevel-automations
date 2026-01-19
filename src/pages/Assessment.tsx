@@ -622,7 +622,7 @@ export default function Assessment() {
                   </p>
                 </div>
 
-                {/* Your Next Step: 5-Day AI Roadmap */}
+                {/* Your Next Step: AI Audit */}
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 mb-8">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
@@ -632,12 +632,12 @@ export default function Assessment() {
                     </div>
                     <div>
                       <p className="text-sm text-blue-600 font-medium">Your Next Step</p>
-                      <h3 className="text-xl font-bold text-slate-900">The 5-Day AI Roadmap</h3>
+                      <h3 className="text-xl font-bold text-slate-900">The AI Audit</h3>
                     </div>
                   </div>
 
                   <p className="text-slate-600 mb-6">
-                    In 5 days, you'll go from "AI sounds cool" to "here's exactly where to start." We'll map your operations, identify your highest-ROI automation opportunity, and give you a clear action plan.
+                    In 1-2 weeks, we'll map your operations, identify your highest-ROI automation opportunities, and deliver a prioritized action plan you can execute immediately.
                   </p>
 
                   <div className="grid sm:grid-cols-2 gap-4 mb-6">
@@ -669,7 +669,7 @@ export default function Assessment() {
 
                   <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
                     <p className="text-blue-800 text-sm">
-                      <span className="font-semibold">Book a call to get started.</span> We'll review your assessment, discuss your business, and see if the 5-Day AI Roadmap is a fit.
+                      <span className="font-semibold">Book a call to get started.</span> We'll review your assessment, discuss your business, and see if an AI Audit is right for you.
                     </p>
                   </div>
                 </div>
@@ -703,7 +703,7 @@ export default function Assessment() {
                         3
                       </div>
                       <div>
-                        <p className="font-medium text-slate-900">See if the 5-Day Roadmap is right for you</p>
+                        <p className="font-medium text-slate-900">See if an AI Audit is right for you</p>
                         <p className="text-sm text-slate-500">If it's a fit, we'll map out next steps. If not, you'll still leave with clarity.</p>
                       </div>
                     </div>

@@ -128,6 +128,8 @@ Watch for:
 - How much time does each person spend on this?
 - If you could wave a magic wand, what would you fix?
 
+**Important:** If the user gives general answers like "all of the above" or a rough total estimate, accept them and move to Phase 7. Don't ask them to break down or quantify further — you have enough.
+
 ### Phase 7: Confirmation & Wrap-up
 - Provide a complete summary of the process as you understand it
 - Ask if anything is missing or incorrect
