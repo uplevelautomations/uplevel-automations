@@ -204,6 +204,34 @@ function EmailCapture({ onSubmit }: { onSubmit: (info: UserInfo) => void }) {
     e.preventDefault()
     if (!name.trim() || !email.trim()) return
     setIsSubmitting(true)
+
+    // Submit to Google Sheets immediately (status: started)
+    const startedData = {
+      type: 'process-mapper',
+      timestamp: new Date().toISOString(),
+      name: name.trim(),
+      email: email.trim(),
+      status: 'started',
+      processName: '',
+      businessName: '',
+      businessType: '',
+      teamSize: '',
+      stepsCount: '',
+      toolsUsed: '',
+      painPoints: '',
+      duration: '',
+      transcript: ''
+    }
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(startedData),
+    }).catch(error => {
+      console.error('Error submitting start to Google Sheets:', error)
+    })
+
     setTimeout(() => {
       onSubmit({ name: name.trim(), email: email.trim() })
     }, 300)
@@ -692,6 +720,7 @@ function ProcessComplete({
       timestamp: new Date().toISOString(),
       name: userInfo.name,
       email: userInfo.email,
+      status: 'completed',
       processName: processData.processName,
       businessName: processData.businessName,
       businessType: processData.businessType,
