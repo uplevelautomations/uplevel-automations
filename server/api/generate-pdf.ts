@@ -27,6 +27,12 @@ interface ProcessData {
     condition: string
     paths: string[]
   }>
+  automationOpportunities?: Array<{
+    title: string
+    observation: string
+    solution: string
+    impact: string
+  }>
 }
 
 interface UserInfo {
@@ -214,23 +220,93 @@ export async function generatePdfHandler(req: Request, res: Response) {
     // Pain Points section
     if (processData.painPoints && processData.painPoints.length > 0) {
       content.push({
-        text: 'Pain Points & Opportunities',
+        text: 'Pain Points Identified',
         style: 'heading',
         margin: [0, 15, 0, 10]
       })
 
       processData.painPoints.forEach((pp, i) => {
         content.push({
-          text: `Pain Point ${i + 1}`,
-          style: 'subheading',
-          margin: [0, 8, 0, 3]
-        })
-
-        content.push({
-          text: pp,
+          text: `${i + 1}. ${pp}`,
           style: 'body',
           margin: [0, 0, 0, 6]
         })
+      })
+    }
+
+    // Automation Opportunities section
+    if (processData.automationOpportunities && processData.automationOpportunities.length > 0) {
+      // Page break before Automation Opportunities
+      content.push({ text: '', pageBreak: 'after' })
+
+      content.push({
+        text: 'Automation Opportunities',
+        style: 'heading',
+        margin: [0, 0, 0, 6]
+      })
+
+      content.push({
+        text: 'Based on your process, here are areas where automation could save time and reduce errors:',
+        style: 'body',
+        margin: [0, 0, 0, 15]
+      })
+
+      processData.automationOpportunities.forEach((opp, i) => {
+        // Opportunity title with number
+        content.push({
+          text: `${i + 1}. ${opp.title}`,
+          style: 'stepTitle',
+          margin: [0, 10, 0, 6]
+        })
+
+        // Observation
+        content.push({
+          text: [{ text: 'What we noticed: ', bold: true, color: '#64748b' }, opp.observation],
+          style: 'body',
+          margin: [12, 0, 0, 4]
+        })
+
+        // Solution
+        content.push({
+          text: [{ text: 'Potential solution: ', bold: true, color: '#64748b' }, opp.solution],
+          style: 'body',
+          margin: [12, 0, 0, 4]
+        })
+
+        // Impact
+        content.push({
+          text: [{ text: 'Estimated impact: ', bold: true, color: '#64748b' }, opp.impact],
+          style: 'body',
+          margin: [12, 0, 0, 8]
+        })
+      })
+
+      // CTA after opportunities
+      content.push({
+        canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1, lineColor: '#e2e8f0' }],
+        margin: [0, 20, 0, 15]
+      })
+
+      content.push({
+        text: 'Want to explore these opportunities?',
+        style: 'subheading',
+        alignment: 'center',
+        margin: [0, 0, 0, 6]
+      })
+
+      content.push({
+        text: 'Book a free strategy call to discuss how automation could work for your business.',
+        style: 'body',
+        alignment: 'center',
+        margin: [0, 0, 0, 8]
+      })
+
+      content.push({
+        text: 'cal.com/roy-banwell/ai-strategy-call',
+        style: 'body',
+        color: '#2563eb',
+        alignment: 'center',
+        margin: [0, 0, 0, 15]
       })
     }
 

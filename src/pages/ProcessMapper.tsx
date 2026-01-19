@@ -33,6 +33,12 @@ interface ProcessData {
     condition: string
     paths: string[]
   }>
+  automationOpportunities?: Array<{
+    title: string
+    observation: string
+    solution: string
+    impact: string
+  }>
 }
 
 type Stage = 'email' | 'chat' | 'complete'
@@ -40,11 +46,22 @@ type Stage = 'email' | 'chat' | 'complete'
 // System prompt for the AI
 const SYSTEM_PROMPT = `You are an expert business process analyst helping someone document and map out a business process. Your goal is to extract enough detail that the process could be handed to someone unfamiliar with the business and they could execute it, or that an automation engineer could identify clear opportunities for improvement.
 
+## Phase Markers
+
+At the START of each response, include a phase marker on its own line (this powers the progress indicator):
+- [PHASE:1] — Business Context
+- [PHASE:2] — Process Overview
+- [PHASE:3] — People & Roles
+- [PHASE:4] — Step-by-Step Walkthrough
+- [PHASE:5] — Tools & Systems
+- [PHASE:6] — Pain Points & Bottlenecks
+- [PHASE:7] — Confirmation & Wrap-up
+
 ## Your Approach
 
 **Be conversational but purposeful.** You're not filling out a form — you're having a discovery conversation. But every question should move toward a complete picture of the process.
 
-**Challenge vagueness relentlessly.** When someone says things like:
+**Challenge vagueness.** When someone says things like:
 - "We follow up with them" → Ask: How? Email? Phone? What triggers the follow-up? How long after? Who decides?
 - "We check if they're qualified" → Ask: What specific criteria? Is there a checklist? Who makes the call? What happens to unqualified ones?
 - "It goes to the team" → Ask: Which team? One person or multiple? How is it assigned? How do they know it's arrived?
@@ -61,27 +78,31 @@ const SYSTEM_PROMPT = `You are an expert business process analyst helping someon
 - What's annoying or tedious
 - What they wish was different
 
-**Summarize and confirm.** After gathering details on a section, reflect it back to confirm understanding.
+**Summarize and confirm.** After gathering details on a section, reflect it back to confirm understanding before moving on.
 
 ## Conversation Structure
 
-Guide the conversation through these phases:
+Guide the conversation through these phases, but be flexible — sometimes information comes out of order and that's fine.
 
-### Phase 1: Business Context & Process Overview
-- What does your business do? (Just a sentence or two)
-- How big is your team?
-- What is this process called?
-- What triggers this process to start?
-- What's the end result when done successfully?
-- Roughly how often does this process run?
+### Phase 1: Business Context
+Get a quick sense of their business so you can understand the process in context:
+- What does your business do? (Just a sentence or two — enough to understand the context)
+- How big is your team? (Rough sense: just you, a few people, a larger team?)
 
-### Phase 2: People & Roles
-- Who's involved in this process?
-- Who "owns" this process?
-- Any external parties involved?
+### Phase 2: Process Overview
+Understand the process itself:
+- What is this process called? (Or what would you call it?)
+- What triggers this process to start? (A customer action? A time-based trigger? An internal request?)
+- What's the end result when this process is done successfully?
+- Roughly how often does this process run? (Daily? Weekly? Per customer?)
 
-### Phase 3: Step-by-Step Walkthrough
-For each step, extract:
+### Phase 3: People & Roles
+- Who's involved in this process? (Job titles/roles, not specific names)
+- Who "owns" this process — who's responsible if it breaks down?
+- Are there any external parties involved? (Customers, vendors, partners?)
+
+### Phase 4: Step-by-Step Walkthrough
+This is the meat of the conversation. For each step, extract:
 - What happens (the action)
 - Who does it (the role)
 - What they need (inputs, information, access)
@@ -89,34 +110,42 @@ For each step, extract:
 - How long it typically takes
 - What triggers the next step
 
-### Phase 4: Tools & Systems
-- What software/tools are used?
-- Manual steps involving spreadsheets, paper, or copy-pasting?
+Watch for:
+- Decision points (if X then Y, else Z)
+- Parallel paths (things that happen simultaneously)
+- Loops (steps that repeat until a condition is met)
+- Exceptions (what happens when things go wrong)
+
+### Phase 5: Tools & Systems
+- What software/tools are used throughout this process?
+- Are there manual steps that involve spreadsheets, paper, or copy-pasting between systems?
 - Where does information "live" at each stage?
 
-### Phase 5: Pain Points & Bottlenecks
-- Where does this process get stuck or delayed?
+### Phase 6: Pain Points & Bottlenecks
+- Where does this process get stuck or delayed most often?
 - What's the most tedious or annoying part?
 - Roughly how long does the whole thing take, end-to-end?
 - How much time does each person spend on this?
 - If you could wave a magic wand, what would you fix?
 
-### Phase 6: Confirmation & Wrap-up
-- Provide a complete summary of the process
+### Phase 7: Confirmation & Wrap-up
+- Provide a complete summary of the process as you understand it
 - Ask if anything is missing or incorrect
+- Note any areas of uncertainty or "it depends" situations
 
 ## Tone & Style
-- Be warm and professional
+- Be warm and professional, like a consultant who's done this a hundred times
 - Use plain language, not business jargon
-- Be encouraging
+- Be encouraging — mapping processes can feel tedious, acknowledge their effort
+- Be patient with confusion — people often haven't thought about their processes this explicitly before
 - Keep responses focused — don't ramble, but don't be curt either
 
 ## Important Rules
-1. Never assume. If something isn't clear, ask.
-2. One thing at a time. Don't overwhelm with multiple questions.
-3. Acknowledge what you've learned periodically.
-4. Watch for scope creep — keep focused on one process.
-5. Know when you're done. When you have enough detail, start wrapping up.
+1. **Never assume.** If something isn't clear, ask. Don't fill in gaps with guesses.
+2. **Stay focused on one topic per message.** Don't jump between phases or ask about unrelated things in the same response. It's fine to ask follow-up questions on the same topic, but don't bundle "how big is your team?" with "which process do you want to map?" — those are separate conversations.
+3. **Acknowledge what you've learned.** Periodically reflect back what you understand so they know you're tracking.
+4. **Watch for scope creep.** If they start describing multiple processes, gently steer back: "That sounds like a separate process — let's finish mapping [X] first, then we can tackle that one."
+5. **Know when you're done.** When you have enough detail to write a clear, complete process document, start wrapping up. Don't drag it out.
 6. **CRITICAL: If the user says they're done, that's enough, or asks you to complete/finish/wrap up — DO IT IMMEDIATELY.** Don't ask more questions. Provide the summary and add the completion marker. Use reasonable defaults for any missing information.
 
 When the conversation is complete and the user confirms the summary is accurate (or explicitly asks you to finish), end your message with exactly this marker on its own line:
@@ -158,9 +187,9 @@ function EmailCapture({ onSubmit }: { onSubmit: (info: UserInfo) => void }) {
       {/* Benefits */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
         {[
-          { title: '5-10 Minutes', desc: 'Quick conversation to capture your process' },
+          { title: '10-15 Minutes', desc: 'Quick conversation to capture your process' },
           { title: 'Professional PDF', desc: 'Clean documentation you can actually use' },
-          { title: 'Identify Bottlenecks', desc: 'Surface pain points and inefficiencies' },
+          { title: 'Automation Ideas', desc: 'Get recommendations for what to automate' },
         ].map((item, i) => (
           <div key={i} className="text-center p-6 bg-white border border-slate-200 rounded-xl shadow-sm">
             <h3 className="text-slate-900 font-semibold mb-2">{item.title}</h3>
@@ -219,6 +248,47 @@ function EmailCapture({ onSubmit }: { onSubmit: (info: UserInfo) => void }) {
   )
 }
 
+// Phase definitions for progress tracking
+const PHASES = [
+  { id: 1, name: 'Business Context', description: 'Understanding your business' },
+  { id: 2, name: 'Process Overview', description: 'What triggers this process and what it achieves' },
+  { id: 3, name: 'People & Roles', description: 'Who is involved in this process' },
+  { id: 4, name: 'Step-by-Step', description: 'Walking through the workflow' },
+  { id: 5, name: 'Tools & Systems', description: 'Software and systems used' },
+  { id: 6, name: 'Pain Points', description: 'Bottlenecks and frustrations' },
+  { id: 7, name: 'Confirmation', description: 'Review and finalize' },
+]
+
+// Progress Indicator Component
+function ProgressIndicator({ currentPhase }: { currentPhase: number }) {
+  return (
+    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-slate-700">Progress</span>
+        <span className="text-sm text-slate-500">Step {currentPhase} of {PHASES.length}</span>
+      </div>
+      <div className="flex gap-1 mb-2">
+        {PHASES.map((phase) => (
+          <div
+            key={phase.id}
+            className={`h-2 flex-1 rounded-full transition-colors ${
+              phase.id < currentPhase
+                ? 'bg-green-500'
+                : phase.id === currentPhase
+                ? 'bg-blue-500'
+                : 'bg-slate-200'
+            }`}
+          />
+        ))}
+      </div>
+      <div className="text-sm text-slate-600">
+        <span className="font-medium">{PHASES[currentPhase - 1]?.name}</span>
+        <span className="text-slate-400 ml-2">— {PHASES[currentPhase - 1]?.description}</span>
+      </div>
+    </div>
+  )
+}
+
 // Chat Interface Component
 function ChatInterface({
   userInfo,
@@ -230,18 +300,14 @@ function ChatInterface({
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: `Hi ${userInfo.name}! I'm here to help you map out one of your business processes. By the end of our conversation, you'll have a clear, documented workflow that shows exactly how this process works — who does what, when, and how.
+      content: `[PHASE:1]
 
-To get started, tell me a bit about your business and what process you'd like to map out.
+Hi ${userInfo.name}! I'm here to help you map out one of your business processes. By the end of our conversation, you'll have a clear, documented workflow that shows exactly how this process works — who does what, when, and how.
 
-**Not sure where to start?** The highest-impact processes to document are usually:
-- **Client Onboarding** — how you bring new clients into your business
-- **Service Delivery** — how you actually deliver what you sell
-- **Sales** — how leads become paying customers
-
-But you can map any process — just tell me what's eating up your time!`
+To get started, tell me a bit about your business and what process you'd like to map out. For example: "I run a marketing agency and I want to map out how we onboard new clients."`
     }
   ])
+  const [currentPhase, setCurrentPhase] = useState(1)
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
@@ -340,6 +406,15 @@ But you can map any process — just tell me what's eating up your time!`
       const data = await response.json()
       const assistantMessage = data.content
 
+      // Parse phase marker from response
+      const phaseMatch = assistantMessage.match(/\[PHASE:(\d)\]/)
+      if (phaseMatch) {
+        const newPhase = parseInt(phaseMatch[1], 10)
+        if (newPhase >= 1 && newPhase <= 7) {
+          setCurrentPhase(newPhase)
+        }
+      }
+
       setMessages(prev => [...prev, { role: 'assistant', content: assistantMessage }])
 
       // Auto-trigger PDF generation when process is complete
@@ -411,6 +486,9 @@ But you can map any process — just tell me what's eating up your time!`
 
   return (
     <div className="flex flex-col h-[calc(100vh-200px)] max-h-[700px]">
+      {/* Progress Indicator */}
+      {!isComplete && <ProgressIndicator currentPhase={currentPhase} />}
+
       {/* Chat Header */}
       <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-200">
         <div>
@@ -454,7 +532,10 @@ But you can map any process — just tell me what's eating up your time!`
               ) : (
                 <div className="text-sm leading-relaxed prose prose-sm prose-slate max-w-none prose-headings:text-slate-900 prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-strong:text-slate-800">
                   <ReactMarkdown>
-                    {message.content.replace('[PROCESS_COMPLETE]', '').trim()}
+                    {message.content
+                      .replace('[PROCESS_COMPLETE]', '')
+                      .replace(/\[PHASE:\d\]\n*/g, '')
+                      .trim()}
                   </ReactMarkdown>
                 </div>
               )}
@@ -686,25 +767,58 @@ function ProcessComplete({
             We've also sent a copy to <span className="font-medium text-slate-900">{userInfo.email}</span>
           </p>
 
-          {/* Process Summary */}
-          <div className="w-full max-w-md bg-white border border-slate-200 rounded-xl p-6 mb-8 text-left shadow-sm">
-            <h3 className="text-slate-900 font-bold mb-4">{processData.processName}</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Business</span>
-                <span className="text-slate-700">{processData.businessName}</span>
+          {/* Automation Opportunities - The Value */}
+          {processData.automationOpportunities && processData.automationOpportunities.length > 0 && (
+            <div className="w-full max-w-2xl mb-8">
+              <h3 className="text-xl font-bold text-slate-900 mb-2 text-left">
+                Automation Opportunities
+              </h3>
+              <p className="text-slate-600 text-sm mb-6 text-left">
+                Based on your process, here's where automation could save you time:
+              </p>
+              <div className="space-y-4">
+                {processData.automationOpportunities.map((opp, i) => (
+                  <div key={i} className="bg-white border border-slate-200 rounded-xl p-5 text-left shadow-sm">
+                    <h4 className="font-semibold text-slate-900 mb-2">
+                      {i + 1}. {opp.title}
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <p className="text-slate-600">
+                        <span className="font-medium text-slate-700">What we noticed: </span>
+                        {opp.observation}
+                      </p>
+                      <p className="text-slate-600">
+                        <span className="font-medium text-slate-700">Potential solution: </span>
+                        {opp.solution}
+                      </p>
+                      <p className="text-blue-600 font-medium">
+                        {opp.impact}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Steps</span>
-                <span className="text-slate-700">{processData.steps.length} steps</span>
+            </div>
+          )}
+
+          {/* Process Summary - Compact */}
+          <div className="w-full max-w-2xl bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-left">
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              <div>
+                <span className="text-slate-500">Process: </span>
+                <span className="font-medium text-slate-700">{processData.processName}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Duration</span>
-                <span className="text-slate-700">{processData.duration}</span>
+              <div>
+                <span className="text-slate-500">Steps: </span>
+                <span className="font-medium text-slate-700">{processData.steps.length}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Pain Points</span>
-                <span className="text-slate-700">{processData.painPoints.length} identified</span>
+              <div>
+                <span className="text-slate-500">Duration: </span>
+                <span className="font-medium text-slate-700">{processData.duration}</span>
+              </div>
+              <div>
+                <span className="text-slate-500">Pain Points: </span>
+                <span className="font-medium text-slate-700">{processData.painPoints.length}</span>
               </div>
             </div>
           </div>
@@ -714,20 +828,19 @@ function ProcessComplete({
             <a
               href={pdfUrl}
               download={`${processData.processName.replace(/\s+/g, '-')}-Process-Map.pdf`}
-              className="px-10 py-5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-lg shadow-blue-600/25 hover:-translate-y-0.5 mb-8"
+              className="px-8 py-4 bg-white border-2 border-slate-300 hover:border-slate-400 text-slate-700 font-medium rounded-lg transition-all mb-8"
             >
-              Download Process Document (PDF)
+              Download Full Process Document (PDF)
             </a>
           )}
 
-          {/* Next Steps */}
-          <div className="w-full max-w-lg border-t border-slate-200 pt-8 mt-4">
-            <h4 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-4">
-              What's Next?
+          {/* CTA */}
+          <div className="w-full max-w-2xl border-t border-slate-200 pt-8 mt-4 text-center">
+            <h4 className="text-lg font-bold text-slate-900 mb-2">
+              Want to explore these opportunities?
             </h4>
             <p className="text-slate-600 mb-6">
-              Want to discuss this process and see if it can be automated?
-              Book a free strategy call and we'll walk through the opportunities together.
+              Book a free strategy call and we'll walk through how to automate this process.
             </p>
             <a
               href="https://cal.com/roy-banwell/ai-strategy-call"
