@@ -384,9 +384,11 @@ To get started, tell me a bit about your business and what process you'd like to
   const [isComplete, setIsComplete] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [speechSupported, setSpeechSupported] = useState(false)
+  const [hasTriggeredAbandon, setHasTriggeredAbandon] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const abandonTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Check for speech recognition support
   useEffect(() => {
@@ -428,6 +430,49 @@ To get started, tell me a bit about your business and what process you'd like to
       recognitionRef.current = recognition
     }
   }, [])
+
+  // Abandon detection - 10 minute inactivity timer
+  const ABANDON_TIMEOUT = 10 * 60 * 1000 // 10 minutes
+
+  const sendAbandonAlert = () => {
+    if (hasTriggeredAbandon || isComplete) return
+    setHasTriggeredAbandon(true)
+
+    const transcript = messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n')
+
+    fetch('/api/send-abandon-alert', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: userInfo.name,
+        email: userInfo.email,
+        currentPhase,
+        messageCount: messages.length,
+        transcript
+      }),
+    }).catch(error => {
+      console.error('Error sending abandon alert:', error)
+    })
+  }
+
+  const resetAbandonTimer = () => {
+    if (abandonTimerRef.current) {
+      clearTimeout(abandonTimerRef.current)
+    }
+    if (!isComplete && !hasTriggeredAbandon) {
+      abandonTimerRef.current = setTimeout(sendAbandonAlert, ABANDON_TIMEOUT)
+    }
+  }
+
+  // Start abandon timer on mount, reset on message changes
+  useEffect(() => {
+    resetAbandonTimer()
+    return () => {
+      if (abandonTimerRef.current) {
+        clearTimeout(abandonTimerRef.current)
+      }
+    }
+  }, [messages, isComplete])
 
   const toggleListening = () => {
     if (!recognitionRef.current) return

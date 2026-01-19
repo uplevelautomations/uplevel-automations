@@ -12,6 +12,7 @@ import { extractProcessDataHandler } from './api/extract-process-data'
 import { generatePdfHandler } from './api/generate-pdf'
 import { sendEmailHandler } from './api/send-email'
 import { sendAssessmentEmailHandler } from './api/send-assessment-email'
+import { sendAbandonAlertHandler } from './api/send-abandon-alert'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -28,6 +29,7 @@ app.post('/api/extract-process-data', extractProcessDataHandler)
 app.post('/api/generate-pdf', generatePdfHandler)
 app.post('/api/send-email', sendEmailHandler)
 app.post('/api/send-assessment-email', sendAssessmentEmailHandler)
+app.post('/api/send-abandon-alert', sendAbandonAlertHandler)
 
 // Health check
 app.get('/api/health', (_req, res) => {
