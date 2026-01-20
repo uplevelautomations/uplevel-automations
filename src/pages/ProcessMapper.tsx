@@ -603,6 +603,7 @@ To get started, tell me a bit about your business and what process you'd like to
       body: JSON.stringify({
         name: userInfo.name,
         email: userInfo.email,
+        mode,
         currentPhase,
         messageCount: messages.length,
         transcript
@@ -901,10 +902,12 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzs806_T0UUwS
 function ProcessComplete({
   processData,
   userInfo,
+  mode,
   messages
 }: {
   processData: ProcessData
   userInfo: UserInfo
+  mode: MapMode
   messages: Message[]
 }) {
   const [isGenerating, setIsGenerating] = useState(true)
@@ -923,6 +926,7 @@ function ProcessComplete({
       name: userInfo.name,
       email: userInfo.email,
       status: 'completed',
+      mode,
       processName: processData.processName,
       businessName: processData.businessName,
       businessType: processData.businessType,
@@ -1191,10 +1195,11 @@ export default function ProcessMapper() {
             />
           )}
 
-          {stage === 'complete' && processData && userInfo && (
+          {stage === 'complete' && processData && userInfo && mapMode && (
             <ProcessComplete
               processData={processData}
               userInfo={userInfo}
+              mode={mapMode}
               messages={conversationMessages}
             />
           )}
