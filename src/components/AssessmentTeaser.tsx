@@ -72,6 +72,7 @@ export default function AssessmentTeaser() {
         <div className="text-center">
           <Link
             to="/ai-readiness"
+            onClick={() => window.dataLayer?.push({ event: 'cta_click', cta_text: 'Take the Assessment', cta_location: 'assessment_teaser' })}
             className="inline-block px-10 py-4 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition-all shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 hover:-translate-y-0.5 text-lg"
           >
             Take the Assessment

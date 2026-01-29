@@ -385,6 +385,9 @@ function EmailCapture({ onSubmit }: { onSubmit: (info: UserInfo) => void }) {
       console.error('Error submitting start to Google Sheets:', error)
     })
 
+    // GTM: process mapper started
+    window.dataLayer?.push({ event: 'process_mapper_start' })
+
     setTimeout(() => {
       onSubmit({ name: name.trim(), email: email.trim() })
     }, 300)
@@ -996,6 +999,13 @@ function ProcessComplete({
         setHasSubmittedLead(true)
         submitToGoogleSheets()
         sendEmails(data.pdfBase64)
+
+        // GTM: process mapper completed
+        window.dataLayer?.push({
+          event: 'process_mapper_complete',
+          process_name: processData.processName,
+          process_mode: mode,
+        })
       }
     } catch (err) {
       console.error('PDF generation error:', err)
@@ -1124,6 +1134,7 @@ function ProcessComplete({
               href="https://cal.com/roy-banwell/ai-strategy-call"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => window.dataLayer?.push({ event: 'cal_booking_click', booking_source: 'process_mapper' })}
               className="inline-block px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-lg shadow-blue-600/25"
             >
               Book a Strategy Call

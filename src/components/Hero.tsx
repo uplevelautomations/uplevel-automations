@@ -34,6 +34,7 @@ export default function Hero() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             to="/ai-readiness"
+            onClick={() => window.dataLayer?.push({ event: 'cta_click', cta_text: 'Get Your AI Readiness Score', cta_location: 'hero' })}
             className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all text-center shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 hover:-translate-y-0.5"
           >
             Get Your AI Readiness Score

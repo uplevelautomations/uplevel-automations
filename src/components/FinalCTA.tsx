@@ -20,6 +20,7 @@ export default function FinalCTA() {
 
         <Link
           to="/ai-readiness"
+          onClick={() => window.dataLayer?.push({ event: 'cta_click', cta_text: 'Get Your AI Readiness Score', cta_location: 'final_cta' })}
           className="inline-block px-10 py-4 bg-blue-500 hover:bg-blue-400 text-white font-medium rounded-lg transition-all text-lg shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5"
         >
           Get Your AI Readiness Score

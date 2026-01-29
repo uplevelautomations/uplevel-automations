@@ -2,6 +2,12 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Cal from '@calcom/embed-react'
 
+declare global {
+  interface Window {
+    dataLayer?: Record<string, unknown>[]
+  }
+}
+
 // Types
 interface Question {
   id: string
@@ -310,6 +316,13 @@ export default function Assessment() {
     // Fire webhook in background (don't await)
     const score = calculateScore(answers)
     const qualified = !isDisqualified(answers)
+
+    // GTM: assessment completion
+    window.dataLayer?.push({
+      event: 'assessment_complete',
+      assessment_score: score,
+      assessment_qualified: qualified,
+    })
     const { strengths, improvements, quickWins } = generateFeedback(answers)
 
     const submissionData = {
@@ -423,7 +436,10 @@ export default function Assessment() {
 
             {/* CTA button */}
             <button
-              onClick={() => setHasStarted(true)}
+              onClick={() => {
+                setHasStarted(true)
+                window.dataLayer?.push({ event: 'assessment_start' })
+              }}
               className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-blue-600/25 mb-12"
             >
               Check Your Readiness Score
