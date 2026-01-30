@@ -81,6 +81,15 @@ export default function Navbar() {
           >
             Contact
           </button>
+          <a
+            href="https://cal.com/roy-banwell/ai-strategy-call"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => window.dataLayer?.push({ event: 'cal_booking_click', booking_source: 'navbar' })}
+            className="text-sm text-slate-600 hover:text-slate-900 transition-colors font-medium"
+          >
+            Book a Call
+          </a>
           <Link
             to="/ai-readiness"
             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all shadow-sm hover:shadow-md"
@@ -125,6 +134,18 @@ export default function Navbar() {
             >
               Process Mapper
             </Link>
+            <a
+              href="https://cal.com/roy-banwell/ai-strategy-call"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                setMobileMenuOpen(false)
+                window.dataLayer?.push({ event: 'cal_booking_click', booking_source: 'navbar_mobile' })
+              }}
+              className="block py-2 text-slate-700 hover:text-blue-600 font-medium"
+            >
+              Book a Call
+            </a>
             <div className="pt-4 border-t border-slate-200">
               <Link
                 to="/ai-readiness"
